@@ -16,6 +16,7 @@ class _RegisterState extends State<Register> {
   String password;
   String confirmPassword;
   String error="";
+  bool isloading=false;
   final _formKey=GlobalKey<FormState>();
   final AuthServices _authServices = AuthServices();
   @override
@@ -112,7 +113,7 @@ class _RegisterState extends State<Register> {
                   ),
                   Container(
                     margin: EdgeInsets.symmetric(vertical: 20.0),
-                    child: SizedBox(
+                    child: (isloading)?CircularProgressIndicator():SizedBox(
                       width: double.infinity,
                       child: RaisedButton(
                       
@@ -120,19 +121,20 @@ class _RegisterState extends State<Register> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0)),
                         onPressed: () async{
-
+                             
                           if(_formKey.currentState.validate()){
+                             setState(() {
+                                isloading=true;
+                              });
                                UserModel result=await _authServices.registerWithEmailAndPassword(email, password);
                               
                                if(result ==null || result.isError){
                                   setState(() {
                                     error=result.errorMessage;
+                                    isloading=false;
                                   });
                                }
-                               else{
-                               print(result);
-                            
-                               }
+                               
                               
                           }
                         },

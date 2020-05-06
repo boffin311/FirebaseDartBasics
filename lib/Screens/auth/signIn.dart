@@ -13,6 +13,7 @@ class _SignInUserState extends State<SignInUser> {
   String email = "";
   String password = "";
   String error = "";
+  bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
   AuthServices _authServices = AuthServices();
   @override
@@ -105,34 +106,45 @@ class _SignInUserState extends State<SignInUser> {
                   ),
                   Container(
                     margin: EdgeInsets.symmetric(vertical: 20.0),
-                    child: SizedBox(
+                    child: (isLoading)
+                          ? CircularProgressIndicator()
+                          :SizedBox(
                       width: double.infinity,
-                      child: RaisedButton(
-                        color: Colors.blue,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0)),
-                        onPressed: () {
-                          if (_formKey.currentState.validate()) {
-                            _authServices
-                                .singInWithEmailAndPassword(email, password)
-                                .then((result) {
-                              if (result.isError) {
-                                setState(() {
-                                  error = result.errorMessage;
-                                });
+                      child:  RaisedButton(
+                              color: Colors.blue,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30.0)),
+                              onPressed: () {
                                 
-                              }
-                            });
-                          }
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.all(15.0),
-                          child: Text(
-                            "Sign In",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
+                                if (_formKey.currentState.validate()) {
+                                  setState(() {
+                                  isLoading = true;
+                                });
+                                  _authServices
+                                      .singInWithEmailAndPassword(
+                                          email, password)
+                                      .then((result) {
+                                    if (result.isError) {
+                                      setState(() {
+                                        error = result.errorMessage;
+                                        isLoading = false;
+                                      });
+                                    }
+                                  }).catchError((error) {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  });
+                                }
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.all(15.0),
+                                child: Text(
+                                  "Sign In",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
                     ),
                   ),
                   Align(
