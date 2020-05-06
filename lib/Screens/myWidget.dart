@@ -9,7 +9,7 @@ class MyWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final user=Provider.of<UserModel>(context);
     return Container(
-      child: (user==null)?Authenticate():MyHome(),
+      child: (user!=null && user.uid==null)?Authenticate():MyHome(),
     );
   }
 }

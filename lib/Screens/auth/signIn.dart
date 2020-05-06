@@ -10,6 +10,10 @@ class SignInUser extends StatefulWidget {
 }
 
 class _SignInUserState extends State<SignInUser> {
+  String email = "";
+  String password = "";
+  String error = "";
+  final _formKey = GlobalKey<FormState>();
   AuthServices _authServices = AuthServices();
   @override
   Widget build(BuildContext context) {
@@ -62,13 +66,38 @@ class _SignInUserState extends State<SignInUser> {
                     height: 20.0,
                   ),
                   Form(
+                    key: _formKey,
                     child: Column(
                       children: <Widget>[
                         TextFormField(
+                          onChanged: ((val) {
+                            setState(() {
+                              email = val;
+                            });
+                          }),
+                          validator: ((val) {
+                            if (email.isEmpty) {
+                              return "Email is Required field";
+                            }
+                            return null;
+                          }),
                           decoration: InputDecoration(hintText: "Email"),
                         ),
                         TextFormField(
                           obscureText: true,
+                          validator: ((val) {
+                            if (password.isEmpty) {
+                              return "Password is Required field";
+                            }
+                            if (password.length < 8)
+                              return "Weak Password, Password should be 8 character long";
+                            return null;
+                          }),
+                          onChanged: ((val) {
+                            setState(() {
+                              password = val;
+                            });
+                          }),
                           decoration: InputDecoration(hintText: "Password"),
                         )
                       ],
@@ -82,7 +111,20 @@ class _SignInUserState extends State<SignInUser> {
                         color: Colors.blue,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0)),
-                        onPressed: () {},
+                        onPressed: () {
+                          if (_formKey.currentState.validate()) {
+                            _authServices
+                                .singInWithEmailAndPassword(email, password)
+                                .then((result) {
+                              if (result.isError) {
+                                setState(() {
+                                  error = result.errorMessage;
+                                });
+                                
+                              }
+                            });
+                          }
+                        },
                         child: Padding(
                           padding: EdgeInsets.all(15.0),
                           child: Text(
@@ -138,14 +180,24 @@ class _SignInUserState extends State<SignInUser> {
                         children: <TextSpan>[
                           TextSpan(text: "Do not have a account?"),
                           TextSpan(
-                            
-                          
                               text: " Create one ",
-                              recognizer: TapGestureRecognizer()..onTap = (){
-                                print("I am tapped");
-                                widget.toggleView();},
-                              style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold,fontSize: 15.0))
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  print("I am tapped");
+                                  widget.toggleView();
+                                },
+                              style: TextStyle(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15.0))
                         ]),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                    child: Text(
+                      error,
+                      style: TextStyle(color: Colors.red),
+                    ),
                   )
                 ],
               ),
