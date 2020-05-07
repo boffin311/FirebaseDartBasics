@@ -5,8 +5,15 @@ import 'package:flutter/services.dart';
 class AuthServices{
 
   final FirebaseAuth _auth=FirebaseAuth.instance;
+  
+  //get Current User
 
-
+  Future<String> get currentUser async{
+     
+     FirebaseUser user=await _auth.currentUser();
+     String uid=user.uid;
+     return uid;
+  }
   //create UserModel form firebase user
 
   UserModel getUserModel(FirebaseUser user,bool isError,String errorMessage){

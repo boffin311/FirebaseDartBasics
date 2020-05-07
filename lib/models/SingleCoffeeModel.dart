@@ -1,3 +1,5 @@
+import 'package:firebase_database/firebase_database.dart';
+
 class SingleCoffeeModel{
   String coffeeName;
   int coffeeSugar;
@@ -12,4 +14,9 @@ class SingleCoffeeModel{
         "coffeeLevel":model.coffeeLevel
     };
   }
+  SingleCoffeeModel.fromSnapShot(DataSnapshot snapshot):
+  coffeeName= snapshot.value["coffeeName"],
+  coffeeLevel=snapshot.value["coffeeLevel"],
+  coffeeSugar=snapshot.value["coffeeSugar"];
+                                       
 }
